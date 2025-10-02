@@ -1,0 +1,3 @@
+C:/Users/gtrek/Cortex-8/build/CMakeFiles/main.dir
+C:/Users/gtrek/Cortex-8/build/CMakeFiles/edit_cache.dir
+C:/Users/gtrek/Cortex-8/build/CMakeFiles/rebuild_cache.dir
