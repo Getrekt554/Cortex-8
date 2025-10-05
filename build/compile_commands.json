@@ -1,8 +1,0 @@
-[
-{
-  "directory": "C:/Users/gtrek/Cortex-8/build",
-  "command": "C:\\MinGW\\bin\\g++.exe  @CMakeFiles/main.dir/includes_CXX.rsp -g -o CMakeFiles\\main.dir\\src\\main.cpp.obj -c C:\\Users\\gtrek\\Cortex-8\\src\\main.cpp",
-  "file": "C:/Users/gtrek/Cortex-8/src/main.cpp",
-  "output": "CMakeFiles/main.dir/src/main.cpp.obj"
-}
-]
