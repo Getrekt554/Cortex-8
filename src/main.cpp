@@ -299,8 +299,10 @@ class CPU {
         }
 
         void update_KEYR() {
-            bool shift = false;
-            bool ctrl = false;
+            byte shift = false;
+            byte ctrl = false;
+            byte down = false;
+            byte just_pressed = false;
 
             if (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)) {
                 ctrl = true;
@@ -308,9 +310,23 @@ class CPU {
             if (IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT)) {
                 shift = true;
             }
-            if(GetKeyPressed() != 0) {
-                KEYRLSB =  GetKeyPressed();
-            } 
+            byte key = GetKeyPressed();
+            if (key != 0) {
+                KEYRLSB = key;
+            }
+
+            for (int i = 0; i < 256; i++) {
+                if (IsKeyDown(i)) {
+                    down = true;
+                }
+            }
+            for (int i = 0; i < 256; i++) {
+                if (IsKeyPressed(i)) {
+                    just_pressed = true;
+                }
+            }
+
+            KEYRMSB = (ctrl << 7) | (shift << 6) | (down << 5) | (just_pressed << 4);
         }
 
     public:
@@ -322,6 +338,7 @@ class CPU {
         }
 
         void run() {
+            update_KEYR();
             byte op = page_focus().at(0);
             byte A = page_focus().at(1);
             byte B = page_focus().at(2);
@@ -505,6 +522,7 @@ class CPU {
                 //LD
                 case 0x1E:
                     reg.at(dest).save(ram.load(concat_hex(A, B)));
+                    break;
                 //JMP
                 case 0x1F:
                     current_page = A;
@@ -718,13 +736,51 @@ class CPU {
                 case 0x43:
                     x = reg.at(A).load();
                     reg.at(dest).save(x);
+                    break;
                 //GKEYr
                 case 0x44:
-                    
+                    reg.at(dest).save(KEYRLSB);
+                    break;
+                //GKEYm
+                case 0x45:
+                    ram.store(KEYRLSB, concat_hex(B, dest));
+                    break;
+                //KEYD
+                case 0x46:
+                    reg.at(dest).save(0);
+                    b_reg = false;
+                    if (KEYRMSB & 0x20) {
+                        reg.at(dest).save(KEYRLSB);
+                        b_reg = true;
+                    }
+                    break;
+                //KEYP
+                case 0x47:
+                    reg.at(dest).save(0);
+                    b_reg = false;
+                    if (KEYRMSB & 0x10) {
+                        reg.at(dest).save(KEYRLSB);
+                        b_reg = true;
+                    }
+                    break;
+                //SHFT
+                case 0x48:
+                    b_reg = KEYRMSB & 0x40;
+                    break;
+                //CTRL
+                case 0x49:
+                    b_reg = KEYRMSB & 0x80;
+                    break;
+                //NOP
+                case 0x4A:
+                    for (int i = 0; i < 1000; i++) {
+
+                    }
                     break;
                 //HLT
                 case 0xFF:
                     close = true;
+                    break;
                 default:
                     close = true;
                 }
