@@ -297,12 +297,15 @@ class CPU {
             }
             return page0.focus();
         }
+        byte shift = false;
+        byte ctrl = false;
+        byte down = false;
+        byte just_pressed = false;
 
         void update_KEYR() {
-            byte shift = false;
-            byte ctrl = false;
-            byte down = false;
-            byte just_pressed = false;
+            shift = false;
+            ctrl = false;
+            down = false;
 
             if (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)) {
                 ctrl = true;
@@ -313,6 +316,7 @@ class CPU {
             byte key = GetKeyPressed();
             if (key != 0) {
                 KEYRLSB = key;
+                just_pressed = true;
             }
 
             for (int i = 0; i < 256; i++) {
@@ -320,13 +324,8 @@ class CPU {
                     down = true;
                 }
             }
-            for (int i = 0; i < 256; i++) {
-                if (IsKeyPressed(i)) {
-                    just_pressed = true;
-                }
-            }
 
-            KEYRMSB = (ctrl << 7) | (shift << 6) | (down << 5) | (just_pressed << 4);
+            KEYRMSB = ((ctrl << 7) | (shift << 6) | (down << 5));
         }
 
     public:
@@ -632,6 +631,7 @@ class CPU {
                         pc = concat_hex(B, dest) - 0x04;
                         break;
                     }
+                    break;
                 //JMPT
                 case 0x30:
                     if (!b_reg){
@@ -639,6 +639,7 @@ class CPU {
                         pc = concat_hex(B, dest) - 0x04;
                         break;
                     }
+                    break;
                 //SPiz
                 case 0x31:
                     page2.store(A, concat_hex(B, dest));
@@ -749,18 +750,18 @@ class CPU {
                 case 0x46:
                     reg.at(dest).save(0);
                     b_reg = false;
-                    if (KEYRMSB & 0x20) {
+                    if (down) {
                         reg.at(dest).save(KEYRLSB);
                         b_reg = true;
                     }
                     break;
                 //KEYP
                 case 0x47:
-                    reg.at(dest).save(0);
                     b_reg = false;
-                    if (KEYRMSB & 0x10) {
+                    if (just_pressed) {
                         reg.at(dest).save(KEYRLSB);
                         b_reg = true;
+                        just_pressed = false;
                     }
                     break;
                 //SHFT
