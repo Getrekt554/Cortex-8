@@ -313,14 +313,45 @@ class CPU {
             if (IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT)) {
                 shift = true;
             }
-            byte key = GetKeyPressed();
+            int key = GetKeyPressed();
+
+            switch (key) {
+                case KEY_BACKSPACE:
+                    key = 8;
+                    break;
+                case KEY_TAB:
+                    key = 9;
+                    break;
+                case KEY_ENTER:
+                    key = 13;
+                    break;
+                case KEY_ESCAPE:
+                    key = 27;
+                    break;
+                
+                case KEY_UP:
+                    key = 24;
+                    break;
+                case KEY_DOWN:
+                    key = 25;
+                    break;
+                case KEY_RIGHT:
+                    key = 26;
+                    break;
+                case KEY_LEFT:
+                    key = 28;
+                    break;
+            }
+
             if (key != 0) {
-                KEYRLSB = key;
-                just_pressed = true;
+                if (key != KEY_LEFT_SHIFT && key != KEY_RIGHT_SHIFT && key != KEY_LEFT_CONTROL && key!= KEY_RIGHT_CONTROL){
+                    KEYRLSB = key;
+                    just_pressed = true;
+                }
             }
 
             for (int i = 0; i < 256; i++) {
-                if (IsKeyDown(i)) {
+                if (key != KEY_LEFT_SHIFT && key != KEY_RIGHT_SHIFT && key != KEY_LEFT_CONTROL && key!= KEY_RIGHT_CONTROL){
                     down = true;
                 }
             }
