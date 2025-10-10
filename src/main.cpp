@@ -254,6 +254,10 @@ byte ALU(byte A, byte B, byte OP/*im only gonna use the first 4 bits*/) {
         case 0xE:
             b_reg = A < B;
             break;
+        //equal
+        case 0xF:
+            b_reg = A == B;
+            break;
         default:
             exit(1);
     }
@@ -344,14 +348,14 @@ class CPU {
             }
 
             if (key != 0) {
-                if (key != KEY_LEFT_SHIFT && key != KEY_RIGHT_SHIFT && key != KEY_LEFT_CONTROL && key!= KEY_RIGHT_CONTROL){
+                if (key != KEY_LEFT_SHIFT && key != KEY_RIGHT_SHIFT && key != KEY_LEFT_CONTROL && key!= KEY_RIGHT_CONTROL && key != KEY_LEFT_ALT && key != KEY_RIGHT_ALT){
                     KEYRLSB = key;
                     just_pressed = true;
                 }
             }
 
             for (int i = 0; i < 256; i++) {
-                if (key != KEY_LEFT_SHIFT && key != KEY_RIGHT_SHIFT && key != KEY_LEFT_CONTROL && key!= KEY_RIGHT_CONTROL){
+                if (key != KEY_LEFT_SHIFT && key != KEY_RIGHT_SHIFT && key != KEY_LEFT_CONTROL && key!= KEY_RIGHT_CONTROL && key != KEY_LEFT_ALT && key != KEY_RIGHT_ALT){
                     down = true;
                 }
             }
@@ -807,6 +811,76 @@ class CPU {
                 case 0x4A:
                     for (int i = 0; i < 1000; i++) {
 
+                    }
+                    break;
+                //EQi
+                case 0x4B:
+                    x = reg.at(A).load();
+                    ALU(x, B, 0xF);
+                    break;
+                //EQr
+                case 0x4C:
+                    x = reg.at(A).load();
+                    y = reg.at(B).load();
+                    ALU(x, y, 0xF);
+                    break;
+                //EQm
+                case 0x4D:
+                    x = reg.at(A).load();
+                    y = ram.load(concat_hex(B, dest));
+                    ALU(x, y, 0xF);
+                    break;
+                //HOP
+                case 0x4E:
+                    if (A == 0) {
+                        pc += concat_hex(B, dest);
+                    }
+                    else {
+                        pc -= concat_hex(B, dest);
+                    }
+                    break;
+                //HOPZ
+                case 0x4F:
+                    if (z_reg){
+                        if (A == 0) {
+                            pc += concat_hex(B, dest);
+                        }
+                        else {
+                            pc -= concat_hex(B, dest);
+                        }
+                    }
+                    break;
+                //HOPZ
+                case 0x50:
+                    if (neg_reg){
+                        if (A == 0) {
+                            pc += concat_hex(B, dest);
+                        }
+                        else {
+                            pc -= concat_hex(B, dest);
+                        }
+                    }
+                    break;
+                //HOPZ
+                case 0x51:
+                    if (c_reg){
+                        if (A == 0) {
+                            pc += concat_hex(B, dest);
+                        }
+                        else {
+                            pc -= concat_hex(B, dest);
+                        }
+                    }
+                    break;
+                //HNZ
+                case 0x52:
+                    if (!z_reg){
+                        if (A == 0) {
+                            pc += concat_hex(B, dest);
+                        }
+                        else {
+                            pc -= concat_hex(B, dest);
+                        }
                     }
                     break;
                 //HLT
